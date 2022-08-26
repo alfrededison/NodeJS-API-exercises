@@ -21,12 +21,28 @@ export const addSalesOrder = (order: SalesOrder) => {
 }
 
 export const addQuotes = (order: SalesOrder, carriers: Array<Carrier>) => {
+  if (order.status == 'BOOKED') {
+    throw new Error('Sales order is already booked');
+  }
   const quotes = carriers.map((e) => ({
     carrier: e,
     priceCents: calculateCarrierFees(e, order.items)
   }))
   order.status = 'QUOTED';
   order.quotes = quotes;
+  updateSalesOrder(order);
+  return order;
+}
+
+export const bookCarrier = (order: SalesOrder, carrier: Carrier) => {
+  const quote = order.quotes.find((e) => e.carrier == carrier);
+  if (!quote) {
+    throw new Error('A quote for the requested carrier booking is not available');
+  }
+  order.carrierBooked = carrier;
+  order.carrierPricePaid = quote.priceCents;
+  order.status = 'BOOKED';
+  order.quotes = [];
   updateSalesOrder(order);
   return order;
 }
