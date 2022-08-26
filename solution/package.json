@@ -1,0 +1,15 @@
+{
+  "name": "api-exercise",
+  "version": "1.0.0",
+  "description": "Excercises for writing API",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Hieu Nguyen",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
