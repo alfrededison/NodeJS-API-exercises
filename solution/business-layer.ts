@@ -4,13 +4,18 @@ import {
   addSalesOrder as addToDb,
   updateSalesOrder
 } from './data-layer';
+import { BadRequestException, NotFoundException } from './types/errors';
 
 export const listSalesOrders = (filters: SalesOrdersFilter) => {
   return getFromDb(filters);
 }
 
 export const findSalesOrder = (id: SalesOrder['id']) => {
-  return findFromDb(id);
+  const order = findFromDb(id);
+  if (!order) {
+    throw new NotFoundException('Sales order not found')
+  }
+  return order;
 }
 
 export const addSalesOrder = (order: SalesOrder) => {
@@ -22,7 +27,7 @@ export const addSalesOrder = (order: SalesOrder) => {
 
 export const addQuotes = (order: SalesOrder, carriers: Array<Carrier>) => {
   if (order.status == 'BOOKED') {
-    throw new Error('Sales order is already booked');
+    throw new BadRequestException('Sales order is already booked');
   }
   const quotes = carriers.map((e) => ({
     carrier: e,
@@ -37,7 +42,7 @@ export const addQuotes = (order: SalesOrder, carriers: Array<Carrier>) => {
 export const bookCarrier = (order: SalesOrder, carrier: Carrier) => {
   const quote = order.quotes.find((e) => e.carrier == carrier);
   if (!quote) {
-    throw new Error('A quote for the requested carrier booking is not available');
+    throw new BadRequestException('A quote for the requested carrier booking is not available');
   }
   order.carrierBooked = carrier;
   order.carrierPricePaid = quote.priceCents;
@@ -56,6 +61,6 @@ const calculateCarrierFees = (carrier: Carrier, items: SalesOrder['items']): num
     case 'FEDEX':
       return items.reduce((acc, item) => acc + item.gramsPerItem * 0.03, 1000);
     default:
-      throw new Error(`Unknown carrier: ${carrier}`);
+      throw new BadRequestException(`Unknown carrier: ${carrier}`);
   }
 };

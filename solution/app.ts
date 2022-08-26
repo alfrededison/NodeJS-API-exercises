@@ -1,7 +1,8 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import { addQuotes, addSalesOrder, bookCarrier, findSalesOrder, listSalesOrders } from './business-layer';
+import { BadRequestException, NotFoundException } from './types/errors';
 
 dotenv.config();
 
@@ -25,44 +26,39 @@ app.post('/sales-orders', (req: Request<SalesOrderCreateRequest>, res: Response<
 
 app.post('/sales-orders/:id/quotes', (req: Request<SalesOrderRequestParams, {}, QuotesCreateRequest>, res: Response<QuotesCreateResponse | { error: string }>) => {
   const order = findSalesOrder(req.params.id);
-  if (order) {
-    try {
-      addQuotes(order, req.body.carriers);
-      res.send({
-        quotes: order.quotes
-      });
-    } catch (err: any) {
-      res.status(400).send({
-        error: err.message
-      })
-    }
-  } else {
-    res.status(404).send({
-      error: 'Sales order not found'
-    });
-  }
+  addQuotes(order, req.body.carriers);
+  res.send({
+    quotes: order.quotes
+  });
 });
 
 app.post('/sales-orders/:id/bookings', (req: Request<SalesOrderRequestParams, {}, BookingRequest>, res: Response<BookingResponse | { error: string }>) => {
   const order = findSalesOrder(req.params.id);
-  if (order) {
-    try {
-      bookCarrier(order, req.body.carrier);
-      res.send({
-        carrierBooked: order.carrierBooked as Carrier,
-        carrierPricePaid: order.carrierPricePaid as number
-      });
-    } catch (err: any) {
-      res.status(400).send({
-        error: err.message
-      })
-    }
-  } else {
-    res.status(404).send({
-      error: 'Sales order not found'
-    });
-  }
+  bookCarrier(order, req.body.carrier);
+  res.send({
+    carrierBooked: order.carrierBooked as Carrier,
+    carrierPricePaid: order.carrierPricePaid as number
+  });
 });
+
+const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (res.headersSent) {
+    return next(err)
+  }
+  switch (true) {
+    case err instanceof BadRequestException:
+      res.status(400);
+      break;
+    case err instanceof NotFoundException:
+      res.status(404);
+      break;
+    default:
+      res.status(500);
+  }
+  res.send({ error: err.message })
+}
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
