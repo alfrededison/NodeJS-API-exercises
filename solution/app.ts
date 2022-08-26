@@ -11,8 +11,8 @@ const port = process.env.PORT;
 const jsonParser = bodyParser.json()
 app.use(jsonParser);
 
-app.get('/sales-orders', (req: Request, res: Response<SalesOrdersResponse>) => {
-  const orders = listSalesOrders();
+app.get('/sales-orders', (req: Request<SalesOrdersFilter>, res: Response<SalesOrdersResponse>) => {
+  const orders = listSalesOrders(req.query);
   res.send({
     salesOrders: orders
   });

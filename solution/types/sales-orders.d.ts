@@ -14,13 +14,15 @@ type SalesOrder = {
     carrier: Carrier,
     priceCents: number
   }>
-}
+};
 
 type Status = 'RECEIVED' | 'QUOTED' | 'BOOKED' | 'CANCELLED';
 type Carrier = 'UPS' | 'FEDEX' | 'USPS';
 
+type SalesOrdersFilter = Partial<Pick<SalesOrder, 'status'>>;
+
 type SalesOrdersResponse = {
   salesOrders: Array<SalesOrder>
-}
+};
 
-type SalesOrderCreateRequest = Pick<SalesOrder, 'id' | 'customer' | 'items'>
+type SalesOrderCreateRequest = Pick<SalesOrder, 'id' | 'customer' | 'items'>;

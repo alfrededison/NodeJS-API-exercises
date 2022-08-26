@@ -1,6 +1,9 @@
 const _DATABASE: Array<SalesOrder> = [];
 
-export const listSalesOrders = () => {
+export const listSalesOrders = (filters: SalesOrdersFilter) => {
+  if (filters?.status) {
+    return _DATABASE.filter((e) => e.status == filters.status);
+  }
   return _DATABASE;
 }
 

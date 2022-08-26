@@ -3,8 +3,8 @@ import {
   addSalesOrder as addToDb
 } from './data-layer';
 
-export const listSalesOrders = () => {
-  return getFromDb();
+export const listSalesOrders = (filters: SalesOrdersFilter) => {
+  return getFromDb(filters);
 }
 
 export const addSalesOrder = (order: SalesOrder) => {
