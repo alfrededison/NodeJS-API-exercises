@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import { addSalesOrder, listSalesOrders } from './business-layer';
+import { addQuotes, addSalesOrder, findSalesOrder, listSalesOrders } from './business-layer';
 
 dotenv.config();
 
@@ -21,6 +21,20 @@ app.get('/sales-orders', (req: Request<SalesOrdersFilter>, res: Response<SalesOr
 app.post('/sales-orders', (req: Request<SalesOrderCreateRequest>, res: Response<SalesOrder>) => {
   const order = addSalesOrder(req.body);
   res.send(order);
+});
+
+app.post('/sales-orders/:id/quotes', (req: Request<QuotesCreateParams, {}, QuotesCreateRequest>, res: Response<QuotesCreateResponse|{error: string}>) => {
+  const order = findSalesOrder(req.params.id);
+  if (order) {
+    addQuotes(order, req.body.carriers);
+    res.send({
+      quotes: order.quotes
+    });
+  } else {
+    res.status(404).send({
+      error: 'Sales order not found'
+    });
+  }
 });
 
 app.listen(port, () => {

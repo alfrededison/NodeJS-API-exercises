@@ -20,9 +20,15 @@ type Status = 'RECEIVED' | 'QUOTED' | 'BOOKED' | 'CANCELLED';
 type Carrier = 'UPS' | 'FEDEX' | 'USPS';
 
 type SalesOrdersFilter = Partial<Pick<SalesOrder, 'status'>>;
-
 type SalesOrdersResponse = {
   salesOrders: Array<SalesOrder>
 };
 
 type SalesOrderCreateRequest = Pick<SalesOrder, 'id' | 'customer' | 'items'>;
+
+type QuotesCreateParams = Pick<SalesOrder, 'id'>;
+type QuotesCreateRequest = {
+  carriers: Array<Carrier>
+}
+type QuotesCreateResponse = Pick<SalesOrder, 'quotes'>
+

@@ -7,6 +7,10 @@ export const listSalesOrders = (filters: SalesOrdersFilter) => {
   return _DATABASE;
 }
 
+export const findSalesOrder = (id: SalesOrder['id']) => {
+  return _DATABASE.find((e) => e.id == id);
+}
+
 export const addSalesOrder = (order: SalesOrder) => {
   return _DATABASE.push(order);
 }
