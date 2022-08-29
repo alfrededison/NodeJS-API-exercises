@@ -1,0 +1,5 @@
+## Solving the problem
+
+First install the dependencies via `npm ci`
+
+Then run the development server with `npm run dev`
